@@ -1,0 +1,76 @@
+common:
+    # lid_topic:  "/livox/lidar" 
+    # imu_topic:  "/livox/imu" 
+#    lid_topic:  "/livox/lidar_3JEDLBA00156471"
+#    imu_topic:  "/livox/imu_3JEDLBA00156471"
+#    lid_topic:  "/livox/lidar_3JEDLB700162471"
+    imu_topic:  "/livox/imu_3JEDLB700162471"
+    lid_topic:  "/livox/lidar_3JEDK470014Q751"
+#    imu_topic:  "/livox/imu_3JEDK470014Q751"
+    con_frame: false # true: if you need to combine several LiDAR frames into one
+    con_frame_num: 1 # the number of frames combined
+    cut_frame: false # true: if you need to cut one LiDAR frame into several subframes
+    cut_frame_time_interval: 0.1 # should be integral fraction of 1 / LiDAR frequency
+    time_diff_lidar_to_imu: 0.0 # Time offset between LiDAR and IMU calibrated by other algorithms, e.g., LI-Init (find in Readme)
+
+preprocess:
+    lidar_type: 1 # 4
+    scan_line: 6 # 32
+    timestamp_unit: 1           # the unit of time/t field in the PointCloud2 rostopic: 0-second, 1-milisecond, 2-microsecond, 3-nanosecond.
+    blind: 1.0 
+
+mapping:
+    imu_en: true
+    extrinsic_est_en: false # for aggressive motion, set this variable false
+    imu_time_inte: 0.005 # = 1 / frequency of IMU
+    lidar_time_inte: 0.1
+    satu_acc: 3.0 # the saturation value of IMU's acceleration. not related to the units
+    satu_gyro: 35 # the saturation value of IMU's angular velocity. not related to the units
+    acc_norm: 1.0 # 9.810 # 1.0 for g as unit, 9.81 for m/s^2 as unit of the IMU's acceleration
+    lidar_meas_cov: 0.01 # 0.001; 0.01
+    acc_cov_output: 500
+    gyr_cov_output: 1000 
+    b_acc_cov: 0.0001 
+    b_gyr_cov: 0.0001 
+    imu_meas_acc_cov: 0.1 #1 0.1 # 0.1
+    imu_meas_omg_cov: 0.1 #1 0.01 # 0.1
+    gyr_cov_input: 0.01 # for IMU as input model
+    acc_cov_input: 0.1 # for IMU as input model
+    plane_thr: 0.1 # 0.05, the threshold for plane criteria, the smaller, the flatter a plane
+    match_s: 81
+    ivox_grid_resolution: 2 #2.0
+    # gravity_align: true # true to align the z axis of world frame with the direction of gravity, and the gravity direction should be specified below
+    gravity: [0.0, 0.0, -9.810] # [0.0, 9.810, 0.0] # # [0.0, 0.0, -9.787561] # gvins #
+    gravity_init: [0.0, 0.0, -9.810] # preknown gravity for unstationary start (hr: if imu_en = false, so here no use)
+    extrinsic_T: [ 0.04165, 0.02326, -0.0284 ] 
+    extrinsic_R: [ 1, 0, 0,
+                   0, 1, 0,
+                   0, 0, 1 ]
+
+multi_lidar:
+    lid_topic_multi:  "/livox/lidar_3JEDLB700162471"
+#    lid_topic_multi:  "/livox/lidar_3JEDLBA00156471"
+#    lid_topic_multi:  "/livox/lidar_3JEDK470014Q751"
+    lidar_type_multi: 1
+    scan_line_multi: 6
+    use_multi: true
+#    extrinsic_T_br: [ 0.215, 0, 0 ]
+    extrinsic_T_br: [ -0.192585, -0.0167093, -0.00290801 ]
+#    extrinsic_T_br: [ 0.205, 0.01, 0.01 ]
+    extrinsic_R_br: [-0.99997642, 0.00247355, 0.00637396,
+                     -0.00261836, -0.99973614, -0.0228119,
+                     0.00631586, -0.02282806, 0.99971946]
+
+odometry: 
+    publish_odometry_without_downsample: false
+
+publish:
+    path_en: true                 # false: close the path output
+    scan_publish_en: true         # false: close all the point cloud output
+    scan_bodyframe_pub_en: true  # true: output the point cloud scans in IMU-body-frame
+    trajectory_save_en: true
+
+pcd_save:
+    pcd_save_en: false
+    interval: -1                 # how many LiDAR frames saved in each pcd file; 
+                                 # -1 : all frames will be saved in ONE pcd file, may lead to memory crash when having too much frames.
